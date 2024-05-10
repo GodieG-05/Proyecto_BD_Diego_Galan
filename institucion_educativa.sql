@@ -1,5 +1,5 @@
-/*DDL*/
 /*CREACION DE TABLAS */
+/*COMANDOS DDL*/
 
 CREATE  TABLE curso_escolar ( 
 	id_curso_escolar     INT    NOT NULL   PRIMARY KEY,
@@ -107,6 +107,7 @@ CREATE  TABLE alumno_se_matricula_asignatura (
  );
 
 /*INSERTANDO VALORES*/
+/*COMANDOS DML*/
  
 INSERT INTO direccion (id_direccion, tipo_via1, numero_via1, tipo_via2, numero_via2, barrio)
 VALUES

@@ -1,5 +1,5 @@
-/*DDL*/
 /*CREACION DE TABLAS */
+/*COMANDOS DDL*/
 
 CREATE TABLE producto ( 
 	id_producto          VARCHAR(15)   NOT NULL,
@@ -216,6 +216,7 @@ ALTER TABLE empleado ADD CONSTRAINT fk_empleado_empleado FOREIGN KEY ( id_jefe )
 ___________
 
 /*INSERTANDO VALORES*/
+/*COMANDOS DML*/
 
 INSERT INTO producto (id_producto, nombre, id_gama, cantidad_stock, precio_venta, descripcion)
 VALUES

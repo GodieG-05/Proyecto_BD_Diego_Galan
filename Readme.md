@@ -636,18 +636,28 @@ _______________________________
 
 **III)	CONSULTAS MULTITABLA (Composicion Externa)**
 
-1. SELECT c.id_cliente, c.nombres, c.apellidos, ci.nombre AS ciudad, p.id_pago
+1. Devuelve un listado que muestre solamente los clientes que no han realizado ningún pago.
+
+   SELECT c.id_cliente, c.nombres, c.apellidos, ci.nombre AS ciudad, p.id_pago
+
    FROM cliente AS c
+
    LEFT JOIN pago AS p ON c.id_cliente = p.id_cliente
+
    JOIN ciudad AS ci ON c.id_ciudad = ci.id_ciudad
+
    WHERE p.id_pago IS NULL
 
    ![image](/images/28.png)
 
 2. SELECT c.id_cliente, c.nombres, c.apellidos, ci.nombre AS ciudad, p.id_pedido
+
    FROM cliente AS c
+
    LEFT JOIN pedido AS p ON c.id_cliente = p.id_cliente
+
    JOIN ciudad AS ci ON c.id_ciudad = ci.id_ciudad
+
    WHERE p.id_pedido IS NULL
 
    ![image](/images/29.png)
@@ -655,10 +665,15 @@ _______________________________
    Clientes que no han realizado ningun pedido
 
 3. SELECT DISTINCT c.id_cliente, c.nombres, c.apellidos, ci.nombre AS ciudad, p.id_pedido, pa.id_pago
+
    FROM cliente AS c
+
    LEFT JOIN pedido AS p ON c.id_cliente = p.id_cliente
+
    LEFT JOIN pago AS pa ON c.id_cliente = pa.id_cliente
+
    JOIN ciudad AS ci ON c.id_ciudad = ci.id_ciudad
+
    WHERE pa.id_pago IS NULL AND p.id_pedido IS NULL
 
    ![image](/images/30.png)
@@ -666,8 +681,11 @@ _______________________________
    Clientes que no han realizado ningun pago y ningun pedido
 
 4. SELECT e.id_empleado, e.nombres, e.apellidos, e.id_oficina
+
    FROM oficina AS o
+
    RIGHT JOIN empleado AS e ON e.id_oficina = o.id_oficina
+
    WHERE e.id_oficina IS NULL
 
    ![image](/images/31.png)
@@ -675,8 +693,11 @@ _______________________________
    Empleados que no tienen una oficina asociada
 
 5. SELECT e.id_empleado, e.nombres, e.apellidos, c.id_empleado_ventas AS 'Cliente Asociado'
+
    FROM empleado AS e
+
    LEFT JOIN cliente AS c ON e.id_empleado = c.id_empleado_ventas
+
    WHERE c.id_empleado_ventas IS NULL
 
    ![image](/images/32.png)
@@ -684,9 +705,13 @@ _______________________________
    Empleados que no tienen un cliente asociado
 
 6. SELECT e.id_empleado, e.nombres, e.apellidos, c.id_empleado_ventas AS 'Cliente Asociado', o.id_oficina, o.id_ciudad, o.id_direccion 
+
    FROM empleado AS e
+
    LEFT JOIN cliente AS c ON e.id_empleado = c.id_empleado_ventas
+
    LEFT JOIN oficina AS o ON o.id_oficina = e.id_oficina
+
    WHERE c.id_empleado_ventas IS NULL
 
    ![image](/images/33.png)
@@ -696,9 +721,13 @@ _______________________________
 7. SELECT e.id_empleado, e.nombres, e.apellidos, e.id_oficina,
           CASE WHEN o.id_oficina IS NULL THEN 'No tiene oficina asociada' ELSE 'Tiene oficina asociada' END AS estado_oficina,
           CASE WHEN c.id_cliente IS NULL THEN 'No tiene cliente asociado' ELSE 'Tiene cliente asociado' END AS estado_cliente
+
    FROM empleado e
+
    LEFT JOIN oficina o ON e.id_oficina = o.id_oficina
+
    LEFT JOIN cliente c ON e.id_empleado = c.id_empleado_ventas
+
    WHERE o.id_oficina IS NULL OR c.id_cliente IS NULL;
 
    ![image](/images/34.png)
@@ -706,129 +735,204 @@ _______________________________
     empleados que no tienen una oficina asociada y los que no tienen un cliente asociado.
 
 8. SELECT p.id_producto, p.nombre, p.id_gama, p.precio_venta, id_pedido
+
    FROM producto AS p
+
    LEFT JOIN detalle_pedido as dp ON dp.id_producto = p.id_producto
+
    WHERE id_pedido IS NULL
 
    ![image](/images/35.png)
+
    Productos que nunca han sido listados en un pedido
 
 9. SELECT p.id_producto, p.nombre, p.descripcion, gp.id_imagen
+
    FROM producto AS p
+
    LEFT JOIN detalle_pedido as dp ON dp.id_producto = p.id_producto
+
    JOIN gama_producto AS gp ON p.id_gama = gp.id_gama
+
    WHERE id_pedido IS NULL
+
    ![image](/images/36.png)
+
    Productos que nunca han sido listados en un pedido
 
-11. SELECT DISTINCT c.id_cliente, c.nombres, c.apellidos
+10. SELECT DISTINCT c.id_cliente, c.nombres, c.apellidos
+
     FROM cliente c
+
     LEFT JOIN pedido p ON c.id_cliente = p.id_cliente
+
     LEFT JOIN pago pg ON c.id_cliente = pg.id_cliente
+
     WHERE p.id_pedido IS NOT NULL AND pg.id_pago IS NULL;
 
     ![image](/images/38.png)
+
     clientes que han realizado algún pedido pero no han realizado ningún pago
 
-12. SELECT e.id_empleado, e.nombres AS nombre_empleado, e.apellidos AS apellidos_empleado,
+11. SELECT e.id_empleado, e.nombres AS nombre_empleado, e.apellidos AS apellidos_empleado,
            ej.id_jefe, ej.nombres AS nombre_jefe, ej.apellidos AS apellidos_jefe
+
     FROM empleado e
+
     LEFT JOIN cliente c ON e.id_empleado = c.id_empleado_ventas
+
     LEFT JOIN empleado_jefe ej ON e.id_jefe = ej.id_jefe
+
     WHERE c.id_cliente IS NULL;
+
     ![image](/images/39.png)
+
     empleados que no tienen clientes asociados y el nombre de su jefe asociado
 
 **IV)	CONSULTAS RESUMEN**
 
 1. SELECT COUNT(id_empleado) AS total_empleados
+
    FROM empleado;
+
    ![image](/images/40.png)
 
 2. SELECT p.nombre AS nombre_pais, COUNT(c.id_cliente) AS total_clientes
+
    FROM cliente c
+
    JOIN pais p ON c.id_pais = p.id_pais
+
    GROUP BY p.nombre;
+
    ![image](/images/41.png)
 
 3. SELECT ROUND(AVG(p.total), 2) AS 'Promedio de pago 2009'
    FROM pago AS p
+
    WHERE YEAR(p.fecha_pago) = 2009
+
    ![image](/images/42.png)
+
    Promedio de pago en 2009
 
 4. SELECT ep.nombre AS estado_pedido, COUNT(p.id_pedido) AS total_pedidos
+
    FROM pedido p
+
    JOIN estado_pedido ep ON p.id_estado = ep.id_estado
+
    GROUP BY ep.nombre
+
    ORDER BY total_pedidos DESC;
+
    ![image](/images/43.png)
+
    Total de pedidos segun el estado en que se encuentran. Ordenados de manera descendente
 
 5. SELECT MAX(precio_venta) AS 'precio mas caro', MIN(precio_venta) AS 'precio mas barato'
+
    FROM producto;
 
    ![image](/images/44.png)
+
    El precio mas caro y el mas barato de los productos
 
 6. SELECT COUNT(id_cliente) AS numero_clientes
+
    FROM cliente;
 
    ![image](/images/45.png)
+
    Numero de clientes de la empresa
 
 7. SELECT COUNT(c.id_cliente) AS 'clientes_ de madrid'
+
    FROM cliente c
+
    JOIN ciudad ci ON c.id_ciudad = ci.id_ciudad
+
    WHERE ci.nombre = 'Madrid';
 
    ![image](/images/46.png)
+
    Numero de clientes de Madrid de la empresa 
 
 8. SELECT ci.nombre AS ciudad, COUNT(c.id_cliente) AS numero_clientes
+
    FROM cliente c
+
    JOIN ciudad ci ON c.id_ciudad = ci.id_ciudad
+
    WHERE ci.nombre LIKE 'M%'
+
    GROUP BY ci.nombre;
+
    ![image](/images/47.png)
+
    Total de clientes en ciudades que empiezan por M
 
 9. SELECT e.nombres, COUNT(c.id_cliente) AS 'clientes atendidos'
+
    FROM empleado e
+
    LEFT JOIN cliente c ON e.id_empleado = c.id_empleado_ventas
+
    GROUP BY e.nombres;
+
    ![image](/images/48.png)
+
    Clientes atendidos por cada uno de los representantes de ventas
 
 10. SELECT COUNT(id_cliente) AS 'clientes sin representante'
+
     FROM cliente
+
     WHERE id_empleado_ventas IS NULL;
+
     ![image](/images/49.png)
+
     Clientes sin representande de ventas
 
 11. SELECT c.nombres, c.apellidos, MIN(p.fecha_pago) AS 'primer pago', MAX(p.fecha_pago) AS 'ultimo pago'
     FROM cliente AS c
+
     LEFT JOIN pago AS p ON c.id_cliente = p.id_cliente
+
     GROUP BY c.nombres, c.apellidos;
+
     ![image](/images/50.png)
+
     Fecha del primer y utlimo pago de cada cliente
 
 12. SELECT id_pedido, COUNT(id_producto) AS 'productos diferentes'
+
     FROM detalle_pedido
+
     GROUP BY id_pedido;
+
     ![image](/images/51.png)
+
     Diferentes productos que hay en cada pedido
 
 13. SELECT id_pedido, SUM(cantidad) AS 'total de productos'
+
     FROM detalle_pedido
+
     GROUP BY id_pedido;
+
     ![image](/images/52.png)
 
 14. SELECT dp.id_producto, p.nombre AS 'producto', SUM(dp.cantidad) AS total_unidades_vendidas
+
     FROM detalle_pedido AS dp
+
     JOIN producto as p ON p.id_producto = dp.id_producto
+
     GROUP BY id_producto
+
     ORDER BY total_unidades_vendidas DESC
+
     LIMIT 20;
 
     ![image](/images/53.png)
@@ -838,33 +942,49 @@ _______________________________
         ROUND(SUM(d.cantidad * p.precio_venta) * 0.21,2) AS iva,
         ROUND(SUM(d.cantidad * p.precio_venta),2) + ROUND(SUM(d.cantidad * p.precio_venta) * 0.21,2) AS 'total facturado'
     FROM detalle_pedido AS d
+
     JOIN producto AS p ON d.id_producto = p.id_producto;
 
     ![image](/images/54.png)
 
 16. SELECT dp.id_producto AS 'codigo producto', SUM(dp.cantidad) AS 'total unidades vendidas'
+
     FROM detalle_pedido AS dp
+
     GROUP BY dp.id_producto;
 
     ![image](/images/55.png)
 
 17. SELECT dp.id_producto, SUM(dp.cantidad) AS 'total_unidades_vendidas'
+
     FROM detalle_pedido dp
+
     WHERE dp.id_producto LIKE 'OR%'
+    
     GROUP BY dp.id_producto;
+
     No hay productos cuyo id_producto empiece por OR
 
 18. SELECT p.nombre AS producto, SUM(dp.cantidad) AS 'unidades vendidas', ROUND(SUM(dp.cantidad * p.precio_venta),2) AS total_facturado, ROUND(SUM(dp.cantidad * p.precio_venta * 1.21),2) AS 'total facturado con IVA'
+
     FROM detalle_pedido AS dp
+
     JOIN producto AS p ON dp.id_producto = p.id_producto
+
     GROUP BY p.nombre
+
     HAVING total_facturado > 3000;
+
     ![image](/images/56.png)
 
 19. SELECT YEAR(fecha_pago) AS 'Año', SUM(total) AS 'Facturacion del año'
+
     FROM pago AS p
+
     GROUP BY YEAR(fecha_pago)
+
     ORDER BY YEAR(fecha_pago) ASC;
+
     ![image](/images/57.png)
 
 
@@ -1443,57 +1563,355 @@ _______________________________
 **VI)	CONSULTAS VARIADAS**
 
 1. SELECT c.nombres AfghfS cliente , COUNT(p.id_pedido) AS 'pedidos realizados'
+
    FROM cliente c
+
    LEFT JOIN pedido p ON c.id_cliente = p.id_cliente
+
    GROUP BY c.nombres;
+
    ![image](/images/58.png)
+
 2. SELECT c.nombres AS cliente, COALESCE(SUM(pa.total), 0) AS 'total pagado'
+
    FROM cliente AS c
+
    LEFT JOIN pago AS pa ON c.id_cliente = pa.id_cliente
+
    GROUP BY c.nombres;
+
    ![image](/images/59.png)
+
 3. SELECT c.nombres, c.apellidos, p.id_pedido, YEAR(p.fecha_pedido) AS 'Año'
+
    FROM cliente AS c
+
    JOIN pedido AS p ON c.id_cliente = p.id_cliente
+
+
    WHERE YEAR(p.fecha_pedido) = 2008
    ORDER BY c.nombres ASC;
+
    ![image](/images/60.png)
+
 4. SELECT 
    c.nombres AS 'nombre cliente', CONCAT(e.nombres, ' ', e.apellidos) AS 'nombre representante', t.numero_telefono AS 'telefono de oficina'
+
    FROM  cliente AS c
+
    LEFT JOIN  empleado AS e ON c.id_empleado_ventas = e.id_empleado
+
    LEFT JOIN  oficina AS o ON e.id_oficina = o.id_oficina
+
    LEFT JOIN  telefono AS t ON o.id_telefono = t.id_telefono
+
    WHERE  c.id_cliente NOT IN (SELECT id_cliente FROM pago)
+
    ![image](/images/61.png)
-5. SELECT 
-   c.nombres AS cliente,
-   CONCAT(e.nombres, ' ', e.apellidos) AS 'nombre representante',
-   ci.nombre AS ciudad
+
+5. SELECT c.nombres AS cliente, CONCAT(e.nombres, ' ', e.apellidos) AS 'nombre representante', ci.nombre AS ciudad
+
    FROM  cliente AS c LEFT 
+
    JOIN  empleado AS e ON c.id_empleado_ventas = e.id_empleado
+
    LEFT JOIN  oficina AS o ON e.id_oficina = o.id_oficina
+
    LEFT JOIN  ciudad AS ci ON o.id_ciudad = ci.id_ciudad;
+
    ![image](/images/62.png)
+
 6. SELECT 
        e.nombres AS 'nombre',
        e.apellidos AS 'apellidos',
        e.puesto AS 'puesto',
        t.numero_telefono AS 'telefono'
+
    FROM  empleado AS e
+
    JOIN oficina AS o ON e.id_oficina = o.id_oficina
+
    JOIN telefono AS t ON o.id_telefono = t.id_telefono
+
    WHERE  e.id_empleado NOT IN (SELECT id_empleado_ventas FROM cliente);
+
    ![image](/images/63.png)
+
    empleados que no son representante de ventas de ningún cliente
+
 7. SELECT ci.nombre AS ciudad, COUNT(e.id_empleado) AS 'numero de empleados'
+
    FROM ciudad AS ci
+
    LEFT JOIN oficina AS o ON ci.id_ciudad = o.id_ciudad
+
    LEFT JOIN empleado AS e ON o.id_oficina = e.id_oficina
+
    GROUP BY ci.nombre;
+
    ![image](/images/64.png)
 
-**VIII) PROCEDIMIENTOS ALMACENADOS**
+_____________________________________
+**VIII) VISTAS**
+
+
+1. ***Ciudades con oficinas***
+
+   CREATE VIEW ciudades_con_oficinas AS
+
+   SELECT o.id_oficina, o.id_ciudad, c.nombre AS ciudad
+
+   FROM oficina AS o, ciudad AS c
+
+   WHERE o.id_ciudad = c.id_ciudad;
+
+   SELECT id_oficina, id_ciudad, ciudad FROM ciudades_con_oficinas
+
+   ```sql
+   +------------+-----------+-------------------+
+   | id_oficina | id_ciudad | ciudad            |
+   +------------+-----------+-------------------+
+   | OF001      | C001      | Bogotá            |
+   | OF002      | C002      | Medellín          |
+   | OF003      | C003      | Buenos Aires      |
+   | OF004      | C004      | Córdoba           |
+   | OF005      | C005      | Barcelona         |
+   | OF006      | C006      | Madrid            |
+   | OF007      | C007      | Los Angeles       |
+   | OF008      | C008      | Miami             |
+   | OF009      | C009      | Ciudad de México  |
+   | OF010      | C010      | Mérida            |
+   +------------+-----------+-------------------+
+
+2. ***Pagos realizados en 2008 mediante PAYPAL***
+
+   CREATE VIEW pagos_2008_paypal AS
+
+   SELECT p.id_pago, p.forma_pago, p.fecha_pago, p.total
+
+   FROM pago AS p
+
+   WHERE p.forma_pago = 'paypal' AND YEAR(p.fecha_pago) = 2008
+
+   ORDER BY p.total DESC;
+
+   SELECT id_pago, forma_pago, fecha_pago, total FROM pagos_2008_paypal
+
+   +---------+------------+------------+--------+
+   | id_pago | forma_pago | fecha_pago | total  |
+   +---------+------------+------------+--------+
+   | PAG0003 | paypal     | 2008-06-10 | 450.75 |
+   | PAG0001 | paypal     | 2008-02-15 | 150.00 |
+   | PAG0006 | paypal     | 2008-11-30 | 100.00 |
+   +---------+------------+------------+--------+
+
+
+3. ***Clientes con pagos***
+
+   CREATE VIEW clientes_con_pagos AS
+
+   SELECT c.id_cliente, c.nombres AS 'Nombre de cliente', p.id_pago
+
+   FROM cliente AS c
+
+   JOIN empleado AS e ON e.id_empleado = c.id_empleado_ventas
+
+   JOIN pago AS p ON c.id_cliente = p.id_cliente;
+
+   SELECT id_cliente, 'Nombre de cliente', id_pago FROM clientes_con_pagos
+
+   +------------+-------------------+---------+
+   | id_cliente | Nombre de cliente | id_pago |
+   +------------+-------------------+---------+
+   |          1 | Nombre de cliente | PAG0001 |
+   |          2 | Nombre de cliente | PAG0002 |
+   |          3 | Nombre de cliente | PAG0003 |
+   |          7 | Nombre de cliente | PAG0004 |
+   |          5 | Nombre de cliente | PAG0005 |
+   |          3 | Nombre de cliente | PAG0006 |
+   |          7 | Nombre de cliente | PAG0007 |
+   |          3 | Nombre de cliente | PAG0008 |
+   |          9 | Nombre de cliente | PAG0009 |
+   |          7 | Nombre de cliente | PAG0010 |
+   +------------+-------------------+---------+
+
+
+4. ***Clientes sin pagos***
+
+   CREATE VIEW clientes_sin_pagos AS
+
+   SELECT c.id_cliente, c.nombres AS 'Nombre de cliente', p.id_pago
+
+   FROM cliente AS c
+
+   JOIN empleado AS e ON e.id_empleado = c.id_empleado_ventas
+
+   LEFT JOIN pago AS p ON c.id_cliente = p.id_cliente
+
+   WHERE p.id_pago IS NULL;
+
+   SELECT id_cliente, 'Nombre de cliente', id_pago FROM clientes_sin_pagos;
+
+   +------------+-------------------+---------+
+   | id_cliente | Nombre de cliente | id_pago |
+   +------------+-------------------+---------+
+   |          4 | Nombre de cliente | NULL    |
+   |          6 | Nombre de cliente | NULL    |
+   |          8 | Nombre de cliente | NULL    |
+   |         10 | Nombre de cliente | NULL    |
+   +------------+-------------------+---------+
+
+5. ***Gamas de productos adquiridas por cada cliente***   
+
+   CREATE VIEW gama_producto_por_cliente AS
+
+   SELECT gp.id_gama, gp.nombre AS gama, c.nombres AS 'Adquirido por', c.id_cliente
+
+   FROM gama_producto as gp
+
+   JOIN producto as p ON p.id_gama = gp.id_gama
+
+   JOIN detalle_pedido AS dp ON dp.id_producto = p.id_producto
+
+   JOIN pedido AS pe ON pe.id_pedido = dp.id_pedido
+
+   JOIN cliente AS c ON c.id_cliente = pe.id_cliente;
+
+   SELECT id_gama, gama, 'Adquirido por', id_cliente FROM gama_producto_por_cliente
+
+   +---------+--------------------+---------------+------------+
+   | id_gama | gama               | Adquirido por | id_cliente |
+   +---------+--------------------+---------------+------------+
+   | GAM0002 | Smartphones        | Adquirido por |          3 |
+   | GAM0008 | Altavoces          | Adquirido por |          3 |
+   | GAM0013 | Muebles de Oficina | Adquirido por |          7 |
+   | GAM0003 | Monitores          | Adquirido por |          7 |
+   | GAM0004 | Ornamentales       | Adquirido por |          9 |
+   | GAM0001 | Electrónicos       | Adquirido por |          9 |
+   | GAM0013 | Muebles de Oficina | Adquirido por |          1 |
+   | GAM0004 | Ornamentales       | Adquirido por |          1 |
+   | GAM0006 | Auriculares        | Adquirido por |          2 |
+   | GAM0008 | Altavoces          | Adquirido por |          1 |
+   | GAM0008 | Altavoces          | Adquirido por |          7 |
+   | GAM0012 | Frutales           | Adquirido por |          5 |
+   | GAM0005 | Impresoras         | Adquirido por |          5 |
+   +---------+--------------------+---------------+------------+
+
+6. ***Producto con mas unidades en stock***  
+
+   CREATE VIEW producto_con_mas_stock AS
+
+   SELECT p.nombre AS producto, p.cantidad_stock
+
+   FROM producto AS p
+
+   WHERE cantidad_stock = (
+
+   ​    SELECT MAX(cantidad_stock)
+
+   ​    FROM producto);
+
+   SELECT producto, cantidad_stock FROM producto_con_mas_stock
+
+   +----------------------------+----------------+
+   | producto                   | cantidad_stock |
+   +----------------------------+----------------+
+   | Lámpara de pie de cristal  |            105 |
+   +----------------------------+----------------+
+
+7. ***Producto con menos unidades en stock***  
+
+   CREATE VIEW producto_con_menos_stock AS
+
+   SELECT p.nombre AS producto, p.cantidad_stock
+
+   FROM producto AS p
+
+   WHERE cantidad_stock = (
+
+   ​    SELECT MIN(cantidad_stock)
+
+   ​    FROM producto);
+
+   SELECT producto, cantidad_stock FROM producto_con_menos_stock
+
+   +------------------------+----------------+
+   | producto               | cantidad_stock |
+   +------------------------+----------------+
+   | Alfombra persa de seda |              6 |
+   +------------------------+----------------+
+
+8. ***Producto sin pedidos*** 
+
+   CREATE VIEW productos_sin_pedidos AS
+
+   SELECT p.id_producto, p.nombre AS producto, p.precio_venta
+
+   FROM producto AS p
+
+   WHERE p.id_producto NOT IN (
+
+      SELECT dp.id_producto
+      
+      FROM detalle_pedido AS dp
+
+   );
+
+   SELECT id_producto, producto, precio_venta FROM productos_sin_pedidos
+
+   +-------------+---------------------------+--------------+
+   | id_producto | producto                  | precio_venta |
+   +-------------+---------------------------+--------------+
+   | PROD007     | Alfombra persa de seda    |      1200.00 |
+   | PROD010     | Reproductor DVD Philips   |        70.00 |
+   | PROD011     | Router TP-Link            |        80.00 |
+   | PROD014     | Hervidor de Agua Moulinex |        40.00 |
+   +-------------+---------------------------+--------------+
+
+9. ***Cantidad de empleados en la compañia***
+
+   CREATE VIEW cantidad_empleados_compañia AS
+
+   SELECT COUNT(id_empleado) AS total_empleados
+
+   FROM empleado;
+
+   SELECT total_empleados FROM cantidad_empleados_compañia
+
+   +-----------------+
+   | total_empleados |
+   +-----------------+
+   |              11 |
+   +-----------------+
+
+10. ***Numero de clientes por pais***
+
+   CREATE VIEW clientes_por_pais AS
+
+   SELECT p.nombre AS nombre_pais, COUNT(c.id_cliente) AS total_clientes
+
+   FROM cliente c
+
+   JOIN pais p ON c.id_pais = p.id_pais
+
+   GROUP BY p.nombre
+
+   ORDER BY total_clientes DESC;
+   
+   SELECT nombre_pais, total_clientes FROM clientes_por_pais;
+
+   +-------------+----------------+
+   | nombre_pais | total_clientes |
+   +-------------+----------------+
+   | España      |              3 |
+   | Colombia    |              2 |
+   | Argentina   |              2 |
+   | México      |              2 |
+   | USA         |              1 |
+   +-------------+----------------+
+_____________________________________
+
+**IX) PROCEDIMIENTOS ALMACENADOS**
 
 1. ***Buscar pedidos por fecha***
 
@@ -1506,165 +1924,362 @@ _______________________________
    BEGIN
 
    ​	SELECT p.id_pedido, p.id_cliente, p.fecha_pedido, p.fecha_esperada, p.fecha_entrega, ep.nombre 	AS estado, p.comentarios
+
    ​	FROM pedido AS p
+
    ​	JOIN estado_pedido AS ep ON p.id_estado = ep.id_estado
+
    ​	WHERE p.fecha_pedido = fechaPedido;
 
    ​	IF FOUND_ROWS() = 0 THEN 
 
    ​		SELECT CONCAT('No se encontraron pedidos para la fecha ', fechaPedido) AS mensaje;
+
    ​	END IF;
+
    END $
+
    DELIMITER ;
+
    CALL buscar_pedidos_por_fecha('2023-03-25')
+   ```sql
+   +-----------+------------+--------------+----------------+---------------+-----------------------+------------------------------+
+   | id_pedido | id_cliente | fecha_pedido | fecha_esperada | fecha_entrega | estado                | comentarios                  |
+   +-----------+------------+--------------+----------------+---------------+-----------------------+------------------------------+
+   |       109 |          4 | 2023-03-25   | 2023-03-30     | 2023-04-02    | entregado con retraso | Pedido entregado con retraso |
+   +-----------+------------+--------------+----------------+---------------+-----------------------+------------------------------+
 
-   
-
-   ***2. Actualizar Stock de producto***
+2. ***Actuaizar Stock de producto***
 
    DELIMITER $
+
    DROP PROCEDURE IF EXISTS actualizar_stock_producto$
+
    CREATE PROCEDURE actualizar_stock_producto(
+
    	IN idProducto VARCHAR(15),
+
    	IN nueva_cantidad SMALLINT)
+
    BEGIN
+
    	UPDATE producto
+
    	SET cantidad_stock = nueva_cantidad
+
    	WHERE id_producto = idProducto;
+
    	IF FOUND_ROWS() > 0 THEN
+
    		SELECT CONCAT('El stock del producto ID ', idProducto, ' fue actualizado') AS mensaje;
+
    		SELECT p.nombre AS producto, p.cantidad_stock
-       	    FROM producto AS p
-       	    WHERE id_producto = idProducto;
-           ELSE
-       	    SELECT CONCAT('No se encontró el producto con ID ', idProducto) AS mensaje;
+
+       	FROM producto AS p
+
+       	WHERE id_producto = idProducto;
+
+      ELSE
+
+       	SELECT CONCAT('No se encontró el producto con ID ', idProducto) AS mensaje;
+
    	END IF;
+
    END $
+
    DELIMITER ;
+
    CALL actualizar_stock_producto('PROD001', 60);
 
-***3. Crear producto de la gama 'Smartphones'***
+   +--------------------------------------------------+
+   | mensaje                                          |
+   +--------------------------------------------------+
+   | El stock del producto ID PROD001 fue actualizado |
+   +--------------------------------------------------+
+   +-----------+----------------+
+   | producto  | cantidad_stock |
+   +-----------+----------------+
+   | Laptop HP |             60 |
+   +-----------+----------------+
 
-DELIMITER $
+3. ***Crear producto de la gama 'Smartphones'***
 
-DROP PROCEDURE IF EXISTS crear_producto_gama_smartphones$
+   DELIMITER $
 
-CREATE PROCEDURE crear_producto_gama_smartphones(
+   DROP PROCEDURE IF EXISTS crear_producto_gama_smartphones$
 
-​        IN idProducto VARCHAR(15),
+   CREATE PROCEDURE crear_producto_gama_smartphones(
 
-​	IN nombre VARCHAR(70),
+   ​        IN idProducto VARCHAR(15),
 
-​	IN cantidadStock SMALLINT,
+   ​	      IN nombre VARCHAR(70),
 
-​	IN precioVenta DECIMAL(15,2),
+   ​	      IN cantidadStock SMALLINT,
 
-​	IN descripcion TEXT)
+   ​	      IN precioVenta DECIMAL(15,2),
 
-BEGIN
+   ​	      IN descripcion TEXT)
 
-​	INSERT INTO producto (id_producto, nombre, id_gama, cantidad_stock, precio_venta, descripcion)
+   BEGIN
 
-​	VALUES (idProducto, nombre, 'GAM0002', cantidadStock, precioVenta, descripcion);
+   ​	   INSERT INTO producto (id_producto, nombre, id_gama, cantidad_stock, precio_venta, descripcion)
 
-​	IF FOUND_ROWS() > 0 THEN
+   ​	   VALUES (idProducto, nombre, 'GAM0002', cantidadStock, precioVenta, descripcion);
 
-​        	SELECT CONCAT('EL producto con ID ', idProducto, ' fue creado exitosamente') AS '¡Alerta!';
+   ​	   IF FOUND_ROWS() > 0 THEN
 
-​        	SELECT p.id_producto, p.nombre AS producto, gp.nombre AS gama, p.cantidad_stock, p.precio_venta, p.descripcion
+   ​     SELECT CONCAT('EL producto con ID ', idProducto, ' fue creado exitosamente') AS '¡Alerta!';
 
-​        	FROM producto AS p
+   ​        	SELECT p.id_producto, p.nombre AS producto, gp.nombre AS gama, p.cantidad_stock, p.precio_venta, p.descripcion
 
-​		JOIN gama_producto AS gp ON p.id_gama = gp.id_gama    
+   ​        	FROM producto AS p
 
-​		WHERE id_producto = idProducto;
+   ​		      JOIN gama_producto AS gp ON p.id_gama = gp.id_gama    
 
-​	ELSE
+   ​		      WHERE id_producto = idProducto;
 
-​    	     SELECT CONCAT('Error al crear producto con ID ', idProducto) AS '¡Alerta!';
+   ​	    ELSE
 
-​	END IF;
+   ​    	     SELECT CONCAT('Error al crear producto con ID ', idProducto) AS '¡Alerta!';
 
-END $
+   ​	END IF;
 
-DELIMITER ;
+   END $
 
-CALL crear_producto_gama_smartphones('PROD016', 'Iphone 15 PRO MAX', 7, 999, '256 GB');
+   DELIMITER ;
 
-***4. Eliminar empleado***
+   CALL crear_producto_gama_smartphones('PROD016', 'Iphone 15 PRO MAX', 7, 999, '256 GB');
 
-DELIMITER $
+      +----------------------------------------------------+
+      | ¡Alerta!                                           |
+      +----------------------------------------------------+
+      | EL producto con ID PROD016 fue creado exitosamente |
+      +----------------------------------------------------+
+      +-------------+-------------------+-------------+----------------+--------------+-------------+
+      | id_producto | producto          | gama        | cantidad_stock | precio_venta | descripcion |
+      +-------------+-------------------+-------------+----------------+--------------+-------------+
+      | PROD016     | Iphone 15 PRO MAX | Smartphones |              7 |       999.00 | 256 GB      |
+      +-------------+-------------------+-------------+----------------+--------------+-------------+
 
-DROP PROCEDURE IF EXISTS eliminar_empleado$
+4. ***Eliminar empleado***
 
-CREATE PROCEDURE eliminar_empleado(
+   DELIMITER $
 
-​	IN idEmpleado INT)
+   DROP PROCEDURE IF EXISTS eliminar_empleado$
 
-BEGIN
+   CREATE PROCEDURE eliminar_empleado(
 
-​	IF EXISTS (SELECT id_empleado FROM empleado WHERE id_empleado = idEmpleado) THEN
+   ​	IN idEmpleado INT)
 
-​		DELETE
+   BEGIN
 
-​		FROM empleado
+   ​	IF EXISTS (SELECT id_empleado FROM empleado WHERE id_empleado = idEmpleado) THEN
 
-​		WHERE id_empleado = idEmpleado;
+   ​		DELETE
 
-​		SELECT CONCAT ('El empleado con ID ', idEmpleado, ' ha sido eliminado') AS '¡Alerta!';
+   ​		FROM empleado
 
-​	ELSE 
+   ​		WHERE id_empleado = idEmpleado;
 
-​		SELECT CONCAT ('El empleado con ID ', idEmpleado, ' no existe') AS '¡Alerta!';
+   ​		SELECT CONCAT ('El empleado con ID ', idEmpleado, ' ha sido eliminado') AS '¡Alerta!';
 
-​	END IF;
+   ​	ELSE 
 
-END $
+   ​		SELECT CONCAT ('El empleado con ID ', idEmpleado, ' no existe') AS '¡Alerta!';
 
-DELIMITER ;
+   ​	END IF;
 
-CALL eliminar_empleado(1);
+   END $
 
-***5. Calcular precio total del pedido***
+   DELIMITER ;
 
-DELIMITER $
+   CALL eliminar_empleado(1);
 
-DROP PROCEDURE IF EXISTS calcular_precio_total_pedido$
-
-CREATE PROCEDURE calcular_precio_total_pedido(
-
-​	IN idPedido INT,
-
-​	IN idProducto VARCHAR(15))
-
-BEGIN
-
-​	DECLARE total DECIMAL(15, 2);
-
-​	IF EXISTS (SELECT id_pedido FROM detalle_pedido WHERE id_pedido = idPedido AND id_producto = idProducto) THEN
-
-​		SELECT SUM(precio_unidad * cantidad) INTO total
-
-​		FROM detalle_pedido
-
-​		WHERE id_pedido = idPedido AND id_producto = idProducto;
-
-​		SELECT total;
-
-​	ELSE 
-
-​		SELECT CONCAT ('No existe el detalle de producto') AS '¡Alerta!';
-
-​	END IF;
-
-END $
-
-DELIMITER ;
-
-CALL calcular_precio_total_pedido (101, 'PROD002');
+   +----------------------------------------+
+   | ¡Alerta!                               |
+   +----------------------------------------+
+   | El empleado con ID 1 ha sido eliminado |
+   +----------------------------------------+
 
 
+5. ***Calcular precio total del pedido***
 
+   DELIMITER $
+
+   DROP PROCEDURE IF EXISTS calcular_precio_total_pedido$
+
+   CREATE PROCEDURE calcular_precio_total_pedido(
+
+   ​	IN idPedido INT,
+
+   ​	IN idProducto VARCHAR(15))
+
+   BEGIN
+
+   ​	DECLARE total DECIMAL(15, 2);
+
+   ​	IF EXISTS (SELECT id_pedido FROM detalle_pedido WHERE id_pedido = idPedido AND id_producto = idProducto) THEN
+
+   ​		SELECT SUM(precio_unidad * cantidad) INTO total
+
+   ​		FROM detalle_pedido
+
+   ​		WHERE id_pedido = idPedido AND id_producto = idProducto;
+
+   ​		SELECT total;
+
+   ​	ELSE 
+
+   ​		SELECT CONCAT ('No existe el detalle de producto') AS '¡Alerta!';
+
+   ​	END IF;
+
+   END $
+
+   DELIMITER ;
+
+   CALL calcular_precio_total_pedido (101, 'PROD002');
+
+      +---------+
+      | total   |
+      +---------+
+      | 1000.00 |
+      +---------+
+
+6. ***Buscar cliente por numero de ID***
+
+   DELIMITER $
+
+   DROP PROCEDURE IF EXISTS buscar_cliente_por_id$
+
+   CREATE PROCEDURE buscar_cliente_por_id(
+
+   IN idCliente INT)
+
+   BEGIN
+
+   SELECT c.id_cliente, CONCAT(c.nombres, ' ', c.apellidos) AS cliente, c.id_ciudad, c.id_empleado_ventas
+
+   FROM cliente AS c
+
+   WHERE id_cliente = idCliente;
+
+   IF FOUND_ROWS() = 0 THEN 
+
+   SELECT CONCAT ('El cliente con ID ', idCliente, ' no existe') AS '¡Alerta!';
+
+   END IF;
+
+   END $
+
+   DELIMITER ;
+
+
+   CALL buscar_cliente_por_id(1);
+
+   +------------+-------------+-----------+--------------------+
+   | id_cliente | cliente     | id_ciudad | id_empleado_ventas |
+   +------------+-------------+-----------+--------------------+
+   |          1 | Juan Pérez  | C001      |                  1 |
+   +------------+-------------+-----------+--------------------+
+
+7. ***Crear un nuevo pedido***
+
+   DELIMITER $
+
+   DROP PROCEDURE IF EXISTS crear_pedido$
+
+   CREATE PROCEDURE crear_pedido(
+
+   IN idPedido INT,
+
+   IN idCliente INT,
+
+   IN fechaPedido DATE,
+
+   IN fechaEsperada DATE,
+
+   IN fechaEntrega DATE,
+
+   IN idEstado INT,
+
+   IN comentarios TEXT)
+
+   BEGIN
+
+   IF NOT EXISTS (SELECT id_pedido FROM pedido WHERE id_pedido = idPedido) THEN 
+   
+      INSERT INTO pedido (id_pedido, id_cliente, fecha_pedido, fecha_esperada, fecha_entrega, id_estado, comentarios)
+
+      VALUES (idPedido, idCliente, fechaPedido, fechaEsperada, fechaEntrega, idEstado, comentarios);
+
+      SELECT CONCAT('Pedido creado exitosamente' ) AS '¡Alerta!';
+
+   ELSE 
+
+      SELECT CONCAT('Un pedido con id ',  idPedido, ' ya existe' ) AS '¡Alerta!';
+
+   END IF;
+   
+   END $
+
+   DELIMITER ;
+
+   CALL crear_pedido(118, 4, '2024-05-09', '2024-05-13', NULL, 3, 'Enviado');
+
+   +----------------------------+
+   | ¡Alerta!                   |
+   +----------------------------+
+   | Pedido creado exitosamente |
+   +----------------------------+
+
+8. ***Actualizar precio de un prducto***
+   DELIMITER $
+
+   DROP PROCEDURE IF EXISTS actualizar_precio_producto$
+
+   CREATE PROCEDURE actualizar_precio_producto(
+
+      IN idProducto VARCHAR(15),
+   
+      IN nuevo_precio DECIMAL(15,2))
+   
+   BEGIN
+
+      UPDATE producto
+   
+      SET precio_venta = nuevo_precio
+   
+      WHERE id_producto = idProducto;
+
+      IF FOUND_ROWS() = 0 THEN 
+   
+         SELECT CONCAT ('El producto con ID ', idProducto, ' no existe') AS '¡Alert!';
+      
+      ELSE 
+   
+         SELECT CONCAT ('El producto con ID ', idProducto, ' ha sido actualizado') AS '¡Alert!';
+      
+         SELECT nombre AS producto, precio_venta AS nuevo_precio FROM producto WHERE id_producto = idProducto;
+      END IF;
+   
+   END $
+
+   DELIMITER ;
+
+   CALL actualizar_precio_producto('PROD003', 199.95);
+
+   +------------------------------------------------+
+   | ¡Alert!                                        |
+   +------------------------------------------------+
+   | El producto con ID PROD003 ha sido actualizado |
+   +------------------------------------------------+
+   +------------+--------------+
+   | producto   | nuevo_precio |
+   +------------+--------------+
+   | Monitor LG |       199.95 |
+   +------------+--------------+
+   
 ___________________________________________________________
 
 
@@ -1713,7 +2328,7 @@ ___________________________________________________________
 
    WHERE a.id_telefono IS NULL
 
-   ```
+   ```sql
    +-------------------+---------+-------------+
    | apellidos         | nombres | id_telefono |
    +-------------------+---------+-------------+
@@ -1764,7 +2379,7 @@ ___________________________________________________________
 
    WHERE a.curso = 3 AND a.cuatrimestre = 1 AND a.id_grado = 7;
 
-   ```
+   ```sql
    +--------------------------------------+-------------+-------+--------------+----------+
    | asignatura                           | tipo        | curso | cuatrimestre | id_grado |
    +--------------------------------------+-------------+-------+--------------+----------+
